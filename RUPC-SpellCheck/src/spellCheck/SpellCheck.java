@@ -14,6 +14,7 @@ public class SpellCheck {
 			System.out.println("			Correct");
 			return true;
 		}
+		//checks if the test word is in all caps and matches a word in the list of correct words
 		for (String s:correct) {
 			if ((word.equals(word.toUpperCase())&&word.equalsIgnoreCase(s))) {
 				System.out.println("			Correct");
@@ -24,13 +25,14 @@ public class SpellCheck {
 	}
 	
 	public static boolean isSpecial(String word) {
-
+		//checks if word is possible acronym
+		//different from purpose of for loop above because this is only if the test word does not match any word on the correct list but is all caps
 		if (word.equals(word.toUpperCase())) {
 			System.out.println("			Possible Acronym");
 			return true;
 		}
 		for (int i=0;i<word.length();i++) {
-			//if word is not a character or is entirely uppercase
+			//checks if word contains non-alphabet characters
 			if (word.charAt(i)<65||(word.charAt(i)>90&&word.charAt(i)<97)||word.charAt(i)>122) {
 				System.out.println("			Special Case");
 				return true;
@@ -43,16 +45,19 @@ public class SpellCheck {
 		if (correct==null) {
 			return false;
 		}
+		//keeps track of all possible correct words with one letter omitted
 		List<String> corrections=new ArrayList<String>();
 		int mismatchedLetters=0;
 		boolean omitted=false;
 		for (String s:correct) {
 			mismatchedLetters=0;
+			//checks if test word is missing first or last letter
 			if (word.equals(s.substring(1))||word.equals(s.substring(0,s.length()-1))) {
 				omitted=true;
 				corrections.add(s);
 				continue;
 			}
+			//checks if test word is missing letter in middle
 			for (int i=0;i<word.length();i++) {
 				if (word.charAt(i)!=s.charAt(i+mismatchedLetters)&&word.charAt(i)!=s.charAt(i+1)) {
 					mismatchedLetters+=2;
@@ -82,11 +87,13 @@ public class SpellCheck {
 		boolean inserted=false;
 		for (String s:correct) {
 			mismatchedLetters=0;
+			//tests if letter was added to beginning or end of string
 			if (s.equals(word.substring(1))||s.equals(word.substring(0,word.length()-1))) {
 				inserted=true;
 				corrections.add(s);
 				continue;
 			}
+			//tests if letter was added in middle of word
 			for (int i=0;i<s.length();i++) {
 				if (s.charAt(i)!=word.charAt(i+mismatchedLetters)&&s.charAt(i)!=word.charAt(i+1)) {
 					mismatchedLetters+=2;
@@ -116,6 +123,7 @@ public class SpellCheck {
 		boolean transposed=false;
 		for (String s:correct) {
 			mismatchedLetters=0;
+			//compares test string against list of correct words to see if any two letters next to each other are transposed
 			for (int i=0;i<word.length()-1;i++) {
 				if (word.charAt(i)!=s.charAt(i)      &&
 					(word.charAt(i+1)==s.charAt(i)   &&
@@ -145,6 +153,7 @@ public class SpellCheck {
 		boolean substituted=false;
 		for (String s:correct) {
 			mismatchedLetters=0;
+			//checks test word against list of correct word to see if a letter has been substituted
 			for (int i=0;i<word.length();i++) {
 				if (Character.toLowerCase(word.charAt(i))!=Character.toLowerCase(s.charAt(i))) {
 					mismatchedLetters++;
@@ -168,6 +177,7 @@ public class SpellCheck {
 		}
 		List<String> corrections=new ArrayList<>();
 		boolean capitalized=false;
+		//checks if test word has a capital character that should be lower case
 		for (String s:correct) {
 			if (word.toLowerCase().equals(s.toLowerCase())) {
 				capitalized=true;
@@ -179,6 +189,7 @@ public class SpellCheck {
 	}
 	
 	public static void printList(String correction, List<String> list){
+		//prints all possible corrections of each type of correction
 		if (list.size()==0) {
 			return;
 		}
@@ -193,6 +204,7 @@ public class SpellCheck {
 	}
 	
 	public static SCNode createLists(Scanner in,File file,int length) {
+		//Returns list of correct and test words (each called separately)
 		String[] wordArr=new String[length];
 		for (int i=0;i<length;i++) {
 			wordArr[i]=in.nextLine();
@@ -218,6 +230,7 @@ public class SpellCheck {
 			word=checkWords[i];
 			System.out.println("		"+word);
 			if (!isCorrect(word,map.get(word.length()))&&!isSpecial(word)) {
+				//as long as not a single correction was found, alerts that no suggestions were found
 				if (
 					!isOmitted(word,map.get(word.length()+1))     &
 					!isInserted(word,map.get(word.length()-1))    &
